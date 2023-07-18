@@ -1,0 +1,44 @@
+    //Get all list of albums
+curl http://localhost:8080/albums
+
+###
+
+    //Add a new album to the list
+curl http://localhost:8080/albums \
+    --include \
+    --header "Content-Type: application/json" \
+    --request "POST" \ 
+    --data '{"id": "4","title": "The Modern Sound of Betty Carter","artist": "Betty Carter","price": 49.99}'
+
+###
+
+    //Navigating album by index
+curl http://localhost:8080/albums/3
+
+###
+
+    //Not Found Error checking
+curl http://localhost:8080/albums/5
+
+###
+
+    //Bad Request Error checking
+curl http://localhost:8080/albums \
+    --include \
+    --header "Content-Type: application/json" \
+    --request "POST" \ 
+    --data ''
+
+###
+
+    //Delete album by index
+curl -X "DELETE" http://localhost:8080/albums/4
+
+###
+
+    //Update album by index
+curl -X "PUT" http://localhost:8080/albums/3 \
+    --include \
+    --header "Content-Type: application/json" \
+    --request "POST" \ 
+    --data '{"id": "3","title": "Abbey Road","artist": "The Beatles","price": 29.99}'
