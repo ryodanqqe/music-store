@@ -25,24 +25,14 @@ func getRouter() *gin.Engine {
 	router := gin.Default()
 	router.GET("/albums", getAlbums)
 	router.GET("/albums/:id", getAlbumByID)
-	router.DELETE("albums/:id", deleteAlbumsByID)
+	router.DELETE("albums/:id", deleteAlbumByID)
 	router.POST("/albums", postAlbums)
-	router.PUT("/albums/:id", updateAlbumsByID)
+	router.PUT("/albums/:id", updateAlbumByID)
 	return router
 }
 
 func getAlbums(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, storage.Read())
-}
-
-func postAlbums(c *gin.Context) {
-	var newAlbum album
-	if err := c.BindJSON(&newAlbum); err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "bad request"})
-		return
-	}
-	storage.Create(newAlbum)
-	c.IndentedJSON(http.StatusCreated, newAlbum)
 }
 
 func getAlbumByID(c *gin.Context) {
@@ -55,7 +45,27 @@ func getAlbumByID(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, album)
 }
 
-func updateAlbumsByID(c *gin.Context) {
+func deleteAlbumByID(c *gin.Context) {
+	id := c.Param("id")
+	err := storage.Delete(id)
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "album not found"})
+		return
+	}
+	c.IndentedJSON(http.StatusNoContent, album{})
+}
+
+func postAlbums(c *gin.Context) {
+	var newAlbum album
+	if err := c.BindJSON(&newAlbum); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "bad request"})
+		return
+	}
+	storage.Create(newAlbum)
+	c.IndentedJSON(http.StatusCreated, newAlbum)
+}
+
+func updateAlbumByID(c *gin.Context) {
 	id := c.Param("id")
 	var newAlbum album
 	c.BindJSON(&newAlbum)
@@ -65,14 +75,4 @@ func updateAlbumsByID(c *gin.Context) {
 		return
 	}
 	c.IndentedJSON(http.StatusOK, album)
-}
-
-func deleteAlbumsByID(c *gin.Context) {
-	id := c.Param("id")
-	err := storage.Delete(id)
-	if err != nil {
-		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "album not found"})
-		return
-	}
-	c.IndentedJSON(http.StatusNoContent, album{})
 }
